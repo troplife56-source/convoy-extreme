@@ -12,11 +12,8 @@ Ou ouvrez simplement `index.html` dans Chrome / Safari / Firefox.
 
 ## 🎮 Contenu
 
-- **Campagne de 14 niveaux** avec étoiles sauvegardées dans le navigateur :
-  - 1 à 4 : créneaux de précision (jusqu'à la double remorque)
-  - 5 à 8 : *Rush Hour* avec cargaison instable (gravier, liquide)
-  - 9 et 10 : convoi à double remorque dans un labyrinthe
-  - 11 à 14 : **parking uniquement en marche arrière**
+- **Campagne de 18 niveaux** de difficulté croissante, avec étoiles, score et meilleur score sauvegardés dans le navigateur : créneaux de précision, *Rush Hour* avec cargaison instable, **parking uniquement en marche arrière**, convoi à double remorque, et **livraisons en ville** avec de plus en plus de circulation.
+- **Écran de résultat** avec « Rejouer » en un clic, « Niveau suivant » et **« Défie tes amis »** (copie un lien avec ton score).
 - **Village en conduite libre** : circulation, feux tricolores, piétons, angles morts, rétroviseurs.
 - **Missions de livraison** (1 ou 2 remorques) avec chronomètre.
 - **Vue du dessus** ou **vue cabine** (pseudo-3D).

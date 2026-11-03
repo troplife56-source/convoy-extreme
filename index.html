@@ -2,6 +2,15 @@
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>Convoy Extreme: Cargo &amp; Rescue</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XEYBH3DR3Q"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-XEYBH3DR3Q');
+</script>
 <style>
 :root{color-scheme:dark;--bg:#12161f;--fg:#f2f5fa;--ac:#ffb400;--ac2:#00e5ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
@@ -44,16 +53,18 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:700 14p
 .sm,.sm.r{top:calc(env(safe-area-inset-top,0px) + 42px)!important;width:56px!important;height:51px!important;border-width:2px;border-radius:8px;opacity:.92}
 .sm{left:6px!important}.sm.r{left:auto!important;right:6px!important}
 #warn{top:calc(env(safe-area-inset-top,0px) + 98px)!important;font-size:15px!important}
-</style><!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-XEYBH3DR3Q"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-XEYBH3DR3Q');
-</script>
-</head><body>
+/* --- rétention : écran de résultat, tutoriel, défi --- */
+.big{font-size:20px!important;padding:15px 12px!important}.pri{background:var(--ac)!important;color:#111!important;border-color:var(--ac)!important;box-shadow:0 0 22px #ffb40088}
+#ov .rs{display:flex;flex-direction:column;align-items:center;gap:8px;width:100%}
+#ov .rs h1{font-size:30px}.rs .stars{font-size:46px;color:#ffd24a;letter-spacing:6px;line-height:1}.rs .sc{font-size:40px;font-weight:900;line-height:1.1}.rs .sub{opacity:.85;font-weight:600}.rs .rec{color:#7dff6b;font-weight:900;font-size:18px}#ov .rs h1.lose{color:#ff6b6b;text-shadow:0 0 18px #ff4d4d}
+.rb{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:min(340px,90vw)}#ov .rb .b{width:auto;font-size:15px;padding:12px 6px}
+.ch{background:#1b2a3a;border:2px solid var(--ac2);border-radius:12px;padding:8px 12px;max-width:340px;font-weight:700}
+#tuto{position:fixed;left:0;right:0;top:26%;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;z-index:5;animation:tf 3s forwards}
+#tuto div{background:#000b;border:2px solid var(--ac);border-radius:14px;padding:9px 16px;font-size:19px;box-shadow:0 0 16px #000}
+#ov .rs{margin:auto 0}@media (orientation:landscape) and (max-height:520px){#ov .rs{gap:4px}#ov .rs h1{font-size:22px}.rs .stars{font-size:30px}.rs .sc{font-size:28px}.rs .rec{font-size:15px}.big{padding:9px 12px!important;font-size:17px!important}#ov .rb .b{padding:8px 6px}#tuto{top:14%}#tuto div{font-size:16px;padding:6px 12px}}
+@keyframes tf{0%,80%{opacity:1}100%{opacity:0}}
+@keyframes pl{0%,100%{box-shadow:0 0 0 0 #ffb40000}50%{box-shadow:0 0 0 10px #ffb400cc}}.pulse{animation:pl .7s 4}
+</style></head><body>
 <canvas id="g"></canvas>
 <div id="hud"><div><div id="h1"></div><div id="h2"></div></div><div style="text-align:right"><div id="h3"></div><div id="bar"><i id="bi" style="width:100%"></i></div></div></div>
 <div id="mirw"><canvas id="mir"></canvas></div>
@@ -63,6 +74,7 @@ html,body{margin:0;height:100%;background:var(--bg);color:var(--fg);font:700 14p
  <div id="gears"><button class="b" id="gD">D</button><button class="b" id="gN">N</button><button class="b" id="gR">R</button></div>
  <div id="right"><div id="col"><button class="b" id="horn" title="Klaxon">📢</button><button class="b" id="dump" title="Benne">⤴</button><button class="b on" id="asst" title="Aide marche arrière">R↺</button><button class="b on" id="bz" style="display:none" title="Angles morts">⚠</button><button class="b" id="vw" title="Vue cabine / dessus">🚛</button><button class="b" id="mnu" title="Menu">☰</button></div><div class="ped" id="brk">FREIN</div><div class="ped" id="gas">GAZ</div></div>
 </div>
+<div id="tuto" class="hide"></div>
 <div id="ov"></div>
 <script>
 /* ===== 0. UTILS / CANVAS ===== */
@@ -74,6 +86,15 @@ addEventListener('resize',rs);rs();
 const vib=p=>{try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}};
 const nd=a=>Math.atan2(Math.sin(a),Math.cos(a)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),rnd=(a,b)=>a+Math.random()*(b-a);
 
+/* ===== 0b. ANALYTICS, STOCKAGE, PARTAGE ===== */
+window.dataLayer=window.dataLayer||[];if(typeof window.gtag!=='function')window.gtag=function(){dataLayer.push(arguments)}; /* utilise VOTRE gtag s'il existe déjà */
+const GA=(n,p)=>{try{gtag('event',n,p||{})}catch(e){}};
+const lsGet=k=>{try{return localStorage.getItem(k)}catch(e){return null}},lsSet=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
+const BASE=(location.protocol=='file:'||!location.host)?'https://troplife56-source.github.io/convoy-extreme/':location.origin+location.pathname;
+const BEST=(()=>{try{return JSON.parse(lsGet('cvx3')||'{}')}catch(e){return{}}})();const svBest=()=>lsSet('cvx3',JSON.stringify(BEST));
+const CH=(()=>{try{const q=new URLSearchParams(location.search),d=+q.get('d')||0,n=+q.get('n')||0;return n>0?{d,n}:null}catch(e){return null}})();
+const lvInfo=k=>typeof k=='number'?{niveau:k+1,mode:'campagne'}:{niveau:0,mode:k[0]=='m'?'livraison':'village_libre'};
+async function copyTxt(t){try{await navigator.clipboard.writeText(t);return 1}catch(e){}try{const a=document.createElement('textarea');a.value=t;a.style.cssText='position:fixed;opacity:0';document.body.appendChild(a);a.select();const ok=document.execCommand('copy');a.remove();return ok}catch(e){return 0}}
 /* ===== 1. DONNÉES NIVEAUX (data-driven) ===== */
 const TL=[120,95];
 const LV={
@@ -124,20 +145,21 @@ function buildVillage(){
   const cum=[0];for(let k=1;k<P.length;k++)cum.push(cum[k-1]+Math.hypot(P[k][0]-P[k-1][0],P[k][1]-P[k-1][1]));return{P,cum,L:cum[cum.length-1]}};
  const loops=[];for(let j=0;j<2;j++)for(let i=0;i<3;i++)loops.push(mkLoop(i,j));loops.push(mkRing());
  const NC=['#d94f4f','#4f8fd9','#e5e5e5','#5fbf70','#e0b13a','#9b6bd8'];
- const npc=[[6,.15,80],[6,.6,84],[1,.5,82],[3,.3,80],[5,.6,84]].map((q,n)=>[q[0],q[1],q[2],NC[n%NC.length]]);
+ const npcAll=[[6,.15,80],[6,.6,84],[1,.5,82],[3,.3,80],[5,.6,84],[6,.85,86],[0,.3,80],[2,.5,84],[4,.2,82],[1,.15,86]].map((q,n)=>[q[0],q[1],q[2],NC[n%NC.length]]),npc=npcAll.slice(0,5);
  const docks=[{n:'Dépôt Nord-Est',x:1652,y:400,w:90,h:300,o:'v'},{n:'Quai Ouest',x:607,y:980,w:90,h:300,o:'v'},{n:'Entrepôt Central',x:1248,y:980,w:90,h:300,o:'v'},{n:'Port Sud-Est',x:1967,y:980,w:90,h:300,o:'v'}];
  const missions=[{a:0,b:1,g:'gravel',t:180},{a:1,b:2,g:'liquid',t:180},{a:2,b:3,g:'gravel',t:200}];
- const peds=[[690,596,890,596,24,'#ff7a59'],[1000,590,1000,790,26,'#d38bff'],[1780,590,1780,790,24,'#ff9fb2'],[1100,10,1100,210,25,'#f5a25d']];
+ const pedsAll=[[690,596,890,596,24,'#ff7a59'],[1000,590,1000,790,26,'#d38bff'],[1780,590,1780,790,24,'#ff9fb2'],[1100,10,1100,210,25,'#f5a25d'],[240,590,240,790,24,'#ffd24a'],[1370,600,1570,600,24,'#7dd87d'],[1000,1170,1000,1370,25,'#9be3ff'],[890,606,690,606,24,'#59a8ff']],peds=pedsAll.slice(0,4);
  return{n:'Village · conduite libre',w:W,h:H,s:[330,150,0],tr:1,cargo:0,type:'free',goal:{x:-9999,y:-9999,w:1,h:1},walls,
   roads:[[0,0,W,220],[0,580,W,220],[0,1160,W,220],[0,0,220,H],[680,0,220,H],[1360,0,220,H],[2040,0,220,H]],
-  lines:[[0,110,W,110],[0,690,W,690],[0,1270,W,1270],[110,0,110,H],[790,0,790,H],[1470,0,1470,H],[2150,0,2150,H]],stripes,peds,loops,npc,xs:XS,ys:YS,docks,missions}}
+  lines:[[0,110,W,110],[0,690,W,690],[0,1270,W,1270],[110,0,110,H],[790,0,790,H],[1470,0,1470,H],[2150,0,2150,H]],stripes,peds,pedsAll,loops,npc,npcAll,xs:XS,ys:YS,docks,missions}}
 LV.village=buildVillage();
-/* ===== 1b. CAMPAGNE : 14 niveaux, difficulté croissante, étoiles sauvegardées ===== */
-const SAVE=(()=>{try{return JSON.parse(localStorage.getItem('cvx')||'[]')}catch(e){return[]}})();
+/* ===== 1b. CAMPAGNE : 18 niveaux, difficulté croissante, étoiles sauvegardées ===== */
+const SAVE=(()=>{try{const n=localStorage.getItem('cvx5');if(n)return JSON.parse(n);const o=JSON.parse(localStorage.getItem('cvx')||'[]'),M=[0,1,3,7,2,5,8,11,13,16,6,9,12,15],r=[];o.forEach((v,i)=>{if(v>0&&M[i]!=null)r[M[i]]=v});return r}catch(e){return[]}})();
+const svSave=()=>lsSet('cvx5',JSON.stringify(SAVE));
 const cars=(g,x=760)=>[[x-g/2-66,60,66,150,'c'],[x+g/2,60,66,150,'c']];
 const X2=[[330,170,60,110,'c'],[560,330,60,110,'c']];
 const GW=(a,b)=>[[500,0,40,a,'w'],[900,b,40,900-b,'w'],[1300,0,40,a,'w'],[1700,b,40,900-b,'w']];
-const CAMP=[
+const CAMP0=[
 {n:'1 · Premier créneau',b:'park',o:{goal:{x:760,y:150,w:120,h:180},walls:cars(120),st:[450,700]}},
 {n:'2 · Créneau et obstacles',b:'park',o:{goal:{x:760,y:150,w:90,h:180},walls:cars(90).concat(X2),st:[450,700]}},
 {n:'3 · Créneau serré',b:'park',o:{goal:{x:760,y:150,w:68,h:180},walls:cars(68).concat(X2,[[200,230,40,40,'w'],[430,200,40,170,'w']]),st:[450,700]}},
@@ -148,10 +170,19 @@ const CAMP=[
 {n:'8 · Rush : le goulot',b:'rush',o:{time:55,walls:LV.rush.walls.concat([[1500,0,40,250,'w'],[1500,450,40,250,'w']]),st:[1000,1600]}},
 {n:'9 · Convoi',b:'convoy',o:{st:[1500,1900]}},
 {n:'10 · Cauchemar',b:'convoy',o:{gtype:'gravel',walls:GW(640,260),st:[1400,1800]}},
-{n:'11 · Créneau à reculons',u:3,b:'park',o:{rev:1,goal:{x:760,y:150,w:120,h:180},walls:cars(120),st:[450,700]}},
-{n:'12 · Reculons + obstacles',u:10,b:'park',o:{rev:1,goal:{x:760,y:150,w:92,h:180},walls:cars(92).concat(X2),st:[450,700]}},
-{n:'13 · Reculons serré',u:11,b:'park',o:{rev:1,goal:{x:760,y:150,w:70,h:180},walls:cars(70).concat(X2,[[200,230,40,40,'w'],[430,200,40,170,'w']]),st:[450,700]}},
-{n:'14 · Double remorque à reculons',u:12,b:'park',o:{rev:1,tr:2,s:[380,480,0],goal:{x:760,y:150,w:90,h:190},walls:cars(90).concat([[330,170,60,110,'c']]),st:[400,650]}}];
+{n:'11 · Créneau à reculons',b:'park',o:{rev:1,goal:{x:760,y:150,w:120,h:180},walls:cars(120),st:[450,700]}},
+{n:'12 · Reculons + obstacles',b:'park',o:{rev:1,goal:{x:760,y:150,w:92,h:180},walls:cars(92).concat(X2),st:[450,700]}},
+{n:'13 · Reculons serré',b:'park',o:{rev:1,goal:{x:760,y:150,w:70,h:180},walls:cars(70).concat(X2,[[200,230,40,40,'w'],[430,200,40,170,'w']]),st:[450,700]}},
+{n:'14 · Double remorque à reculons',b:'park',o:{rev:1,tr:2,s:[380,480,0],goal:{x:760,y:150,w:90,h:190},walls:cars(90).concat([[330,170,60,110,'c']]),st:[400,650]}}];
+const VIL=(n,o)=>({n,b:'village',o:Object.assign({type:'free',ms:1,st:[1300,1800]},o)});
+const V=[VIL('Livraison en ville',{nn:3,np:2,missions:[{a:0,b:1,g:'gravel',t:130},{a:1,b:2,g:'gravel',t:130}]}),
+ VIL('Ville animée',{nn:5,np:4,missions:[{a:0,b:3,g:'liquid',t:130},{a:3,b:2,g:'gravel',t:120}]}),
+ VIL('Heure chargée',{nn:8,np:6,nv:1.1,missions:[{a:2,b:0,g:'liquid',t:120},{a:0,b:3,g:'liquid',t:120}]}),
+ VIL('Heure de pointe · 2 remorques',{tr:2,nn:10,np:8,nv:1.15,missions:[{a:1,b:3,g:'gravel',t:110},{a:3,b:0,g:'liquid',t:110}]})];
+/* ordre final = difficulté croissante (les anciens niveaux gardent leur contenu) */
+const ORD=[0,1,4,2,'V0',5,10,3,6,11,'V1',7,12,8,'V2',13,9,'V3'];
+const CAMP=ORD.map((x,i)=>{const c=typeof x=='number'?CAMP0[x]:V[+x[1]];return Object.assign({},c,{n:(i+1)+' · '+c.n.replace(/^\d+ · /,'')})});
+
 /* ===== 1c. GARAGE : pièces gagnées à chaque livraison, améliorations permanentes ===== */
 const GAR=(()=>{try{return Object.assign({c:0,s:0,e:0,t:0,p:0},JSON.parse(localStorage.getItem('cvx2')||'{}'))}catch(e){return{c:0,s:0,e:0,t:0,p:0}}})();
 const PAINT=['#ff9d00','#e63946','#2a9d8f','#9b5de5','#e9edf5'],PAINT2=['#ffb733','#ff6b78','#45c4b4','#b98af2','#ffffff'];
@@ -164,10 +195,19 @@ let VIEW=0,ASST=true,G=null,keys={},T={gas:0,brk:0,wheel:0,gear:1,horn:0},wr=0,w
 const parts=[],conf=[],txt=[],rings=[];
 function segs(g){const S=[{x:g.x,y:g.y,a:g.a,len:70,wd:40,cab:1}];let hx=g.x-Math.cos(g.a)*30,hy=g.y-Math.sin(g.a)*30;
  g.ph.forEach((p,i)=>{const L=TL[i],c=Math.cos(p),s=Math.sin(p);S.push({x:hx-c*L/2,y:hy-s*L/2,a:p,len:L,wd:44,i});hx-=c*L;hy-=s*L});S.rear=[hx,hy];return S}
-function start(k){const vl=typeof k=='string',c=vl?{b:'village',o:{tr:k[1]=='2'?2:1}}:CAMP[k],l=Object.assign({},LV[c.b],c.o,c.n?{n:c.n}:{});aud();$('mlw').classList.toggle('hide',l.type!='free');$('mrw').classList.toggle('hide',l.type!='free');
+function start(k,src='menu'){const vl=typeof k=='string',c=vl?{b:'village',o:{tr:k[1]=='2'?2:1}}:CAMP[k],l=Object.assign({},LV[c.b],c.o,c.n?{n:c.n}:{});aud();
+ if(l.npcAll)l.npc=l.npcAll.slice(0,l.nn!=null?l.nn:5).map(q=>[q[0],q[1],q[2]*(l.nv||1),q[3]]);if(l.pedsAll)l.peds=l.pedsAll.slice(0,l.np!=null?l.np:4);
+$('mlw').classList.toggle('hide',l.type!='free');$('mrw').classList.toggle('hide',l.type!='free');
  const walls=[[-40,-40,l.w+80,40,'w'],[-40,l.h,l.w+80,40,'w'],[-40,0,40,l.h,'w'],[l.w,0,40,l.h,'w']].concat(l.walls);
- G={k,l,walls,x:l.s[0],y:l.s[1],a:l.s[2],v:0,st:0,ph:Array(l.tr).fill(l.s[2]),o:0,od:0,p:0,pd:0,cargo:l.cargo,hits:0,t:l.time||0,el:0,cd:0,hold:0,done:0,cam:[l.s[0],l.s[1]],bt:0,gp:0,gr:1,sc:0,rpm:0,ln:0,tk:[],warn:0,red:0,inb:{},nc:(l.npc||[]).map(c=>{const o={lp:c[0],s:c[1]*l.loops[c[0]].L,v:0,vm:c[2],col:c[3],x:0,y:0,a:0,bk:0};npcPos(o,l.loops[c[0]]);return o}),ms:typeof k=='string'&&k[0]=='m'?{i:0,st:0,t:l.missions[0].t+(l.tr>1?30:0),hold:0,tot:0,h0:0,r0:0}:null,pe:(l.peds||[]).map(p=>({x1:p[0],y1:p[1],x2:p[2],y2:p[3],v:p[4],c:p[5],len:Math.hypot(p[2]-p[0],p[3]-p[1]),t:Math.random()*2,fz:0,x:p[0],y:p[1]}))};
- parts.length=conf.length=txt.length=rings.length=0;T.gear=1;$('ov').classList.add('hide');setGear();txt.push({t:'Maintiens GAZ (ou ↑)',x:W/2,y:H*.3,a:0,c:'#ffffff',sz:26})}
+ G={k,l,walls,x:l.s[0],y:l.s[1],a:l.s[2],v:0,st:0,ph:Array(l.tr).fill(l.s[2]),o:0,od:0,p:0,pd:0,cargo:l.cargo,hits:0,t:l.time||0,el:0,cd:0,hold:0,done:0,cam:[l.s[0],l.s[1]],bt:0,gp:0,gr:1,sc:0,rpm:0,ln:0,tk:[],warn:0,red:0,inb:{},nc:(l.npc||[]).map(c=>{const o={lp:c[0],s:c[1]*l.loops[c[0]].L,v:0,vm:c[2],col:c[3],x:0,y:0,a:0,bk:0};npcPos(o,l.loops[c[0]]);return o}),ms:(typeof k=='string'&&k[0]=='m')||l.ms?{i:0,st:0,t:l.missions[0].t+(l.tr>1?30:0),hold:0,tot:0,h0:0,r0:0}:null,pe:(l.peds||[]).map(p=>({x1:p[0],y1:p[1],x2:p[2],y2:p[3],v:p[4],c:p[5],len:Math.hypot(p[2]-p[0],p[3]-p[1]),t:Math.random()*2,fz:0,x:p[0],y:p[1]}))};
+ parts.length=conf.length=txt.length=rings.length=0;T.gear=1;$('ov').classList.add('hide');setGear();G.rsd=0;
+ const first=!lsGet('cvx_tuto');if(first)showTuto();else txt.push({t:'Maintiens GAZ (ou ↑)',x:W/2,y:H*.3,a:0,c:'#ffffff',sz:26});
+ GA('partie_commencee',Object.assign({source:src,tentative:(G.tries=(TRY[String(k)]=(TRY[String(k)]||0)+1))},lvInfo(k)))}
+const TRY={};
+function showTuto(){lsSet('cvx_tuto','1');const t=$('tuto'),touch=matchMedia('(pointer:coarse)').matches;
+ t.innerHTML=touch?'<div>👉 <b>GAZ</b> = avancer</div><div>🎡 <b>Volant</b> = tourner</div><div>🅡 <b>R</b> = reculer</div>':'<div>⬆ <b>Flèche haut</b> = avancer</div><div>⬅ ➡ = tourner</div><div>⬇ = reculer</div>';
+ t.classList.remove('hide');t.style.animation='none';void t.offsetWidth;t.style.animation='';['gas','wheel','gR'].forEach(i=>{const e=$(i);e.classList.remove('pulse');void e.offsetWidth;e.classList.add('pulse')});
+ setTimeout(()=>{t.classList.add('hide');['gas','wheel','gR'].forEach(i=>$(i).classList.remove('pulse'))},3000)}
 function setGear(){['D','N','R'].forEach((n,i)=>$('g'+n).classList.toggle('on',T.gear===[1,0,-1][i]))}
 /* clavier */
 addEventListener('keydown',e=>{keys[e.code]=1;aud();if(e.code=='ArrowUp'||e.code=='KeyW'){T.gear=1;setGear()}if(e.code=='ArrowDown'||e.code=='KeyS'){T.gear=-1;setGear()}if(e.code=='KeyH')horn();if(e.code=='KeyT')tgl();if(e.code=='KeyV')tbz();if(e.code=='KeyC')tvw();if(e.code=='KeyB')dump();if(e.code.startsWith('Arrow')||e.code=='Space')e.preventDefault()});
@@ -181,7 +221,7 @@ hold($('brk'),v=>T.brk=v);
  ['pointerup','pointercancel'].forEach(t=>el.addEventListener(t,()=>{on=0;T.gas=0;el.classList.remove('on');el.style.background=''}))})();
 $('gD').onclick=()=>{T.gear=1;setGear()};$('gN').onclick=()=>{T.gear=0;setGear()};$('gR').onclick=()=>{T.gear=-1;setGear()};
 function tgl(){ASST=!ASST;$('asst').classList.toggle('on',ASST);txt.push({t:'Aide marche arrière '+(ASST?'activée':'désactivée'),x:W/2,y:H*.3,a:0,c:'#ffffff',sz:22})}
-$('asst').onclick=tgl;function tbz(){BZON=!BZON;$('bz').classList.toggle('on',BZON)}$('bz').onclick=tbz;$('vw').onclick=tvw;function tvw(){VIEW=VIEW?0:1;$('vw').textContent=VIEW?'🗺':'🚛';$('vw').classList.toggle('on',!!VIEW)}$('mnu').onclick=()=>menu('CONVOY EXTREME','Choisis un niveau.');
+$('asst').onclick=tgl;function tbz(){BZON=!BZON;$('bz').classList.toggle('on',BZON)}$('bz').onclick=tbz;$('vw').onclick=tvw;function tvw(){VIEW=VIEW?0:1;$('vw').textContent=VIEW?'🗺':'🚛';$('vw').classList.toggle('on',!!VIEW)}$('mnu').onclick=()=>{if(G&&!G.done&&G.el>3)GA('partie_abandonnee',Object.assign({temps_s:Math.round(G.el)},lvInfo(G.k)));menu('CONVOY EXTREME','Choisis un niveau.')};
 $('horn').addEventListener('pointerdown',()=>{aud();horn()});$('dump').addEventListener('pointerdown',()=>{aud();dump()});
 /* volant virtuel : drag circulaire, rappel automatique */
 const wh=$('wheel');let w0=0,r0=0;
@@ -296,8 +336,8 @@ function fin(win,err){G.done=1;const g=G;let sc=0,perf=0;
   vib([30,40,80]);txt.push({t:perf?'PERFECT':'BRAVO !',x:W/2,y:H*.38,a:0,c:perf?'#ffd24a':'#00e5ff',sz:56});
   const z=g.l.goal;rings.push({x:z.x,y:z.y,r:10},{x:z.x,y:z.y,r:-40});
   for(let i=0;i<140;i++)conf.push({x:W/2,y:H*.4,vx:rnd(-380,380),vy:rnd(-620,-120),c:['#ffd24a','#00e5ff','#ff3df2','#7dff6b'][i%4],r:rnd(0,6),s:rnd(5,10),l:3});tone(660,.15);setTimeout(()=>tone(880,.15),130);setTimeout(()=>tone(1320,.3),260)}
- const stars=win?(sc>=g.l.st[1]?3:sc>=g.l.st[0]?2:1):0;const gain=win?Math.round(sc/5):0;GAR.c+=gain;sv2();if(stars>(SAVE[g.k]||0)){SAVE[g.k]=stars;try{localStorage.setItem('cvx',JSON.stringify(SAVE))}catch(e){}}
- setTimeout(()=>menu(win?'Livraison réussie ! '+'★'.repeat(stars)+'☆'.repeat(3-stars):'Temps écoulé',win?'Score : '+sc+' pts  ·  Chocs : '+g.hits+'  ·  +'+gain+' 🪙':'La cargaison n’est pas arrivée à temps.',g.k),1800)}
+ const stars=win?(sc>=g.l.st[1]?3:sc>=g.l.st[0]?2:1):0;const gain=win?Math.round(sc/5):0;GAR.c+=gain;sv2();if(stars>(SAVE[g.k]||0)){SAVE[g.k]=stars;svSave()}
+ setTimeout(()=>result({win,k:g.k,sc,t:g.el,stars,gain,hits:g.hits,perf,why:'Temps écoulé !'}),win?1500:700)}
 
 /* ===== 5. RENDU 2.5D (boîtes extrudées) ===== */
 function box(c,x,y,w,h,a,ht,col,lift=0,ex=0,ey=0){const co=Math.cos(a),si=Math.sin(a),P=[[-w/2,-h/2],[w/2,-h/2],[w/2,h/2],[-w/2,h/2]].map(([u,v])=>[x+u*co-v*si,y+u*si+v*co]),ox=LX*lift+(lift?ex:0),oy=LY*lift+(lift?ey:0),hx=LX*(lift+ht)+ex,hy=LY*(lift+ht)+ey;
@@ -306,8 +346,9 @@ function box(c,x,y,w,h,a,ht,col,lift=0,ex=0,ey=0){const co=Math.cos(a),si=Math.s
 const loc=(s,u,v)=>[s.x+u*Math.cos(s.a)-v*Math.sin(s.a),s.y+u*Math.sin(s.a)+v*Math.cos(s.a)];
 const LS=(i,j,t,ns)=>{const tt=(t+(i*5+j*7)%17)%17;if(ns)return tt<6?0:tt<7.5?1:2;return tt>=8.5&&tt<14.5?0:tt>=14.5&&tt<16?1:2};
 function npcPos(c,lp){let s=c.s%lp.L;if(s<0)s+=lp.L;let i=c.i||0;if(lp.cum[i]>s)i=0;while(i<lp.cum.length-2&&lp.cum[i+1]<=s)i++;c.i=i;const t=(s-lp.cum[i])/Math.max(1e-6,lp.cum[i+1]-lp.cum[i]),a=lp.P[i],b=lp.P[i+1];c.x=a[0]+(b[0]-a[0])*t;c.y=a[1]+(b[1]-a[1])*t;c.a=Math.atan2(b[1]-a[1],b[0]-a[0])}
-function mEnd(win){const g=G,m=g.ms;g.done=1;let gain=0;if(win){gain=Math.round(m.tot/5);GAR.c+=gain;sv2();vib([30,40,80]);txt.push({t:'LIVRAISONS TERMINÉES',x:W/2,y:H*.38,a:0,c:'#ffd24a',sz:32});for(let i=0;i<120;i++)conf.push({x:W/2,y:H*.4,vx:rnd(-380,380),vy:rnd(-620,-120),c:['#ffd24a','#00e5ff','#ff3df2','#7dff6b'][i%4],r:rnd(0,6),s:rnd(5,10),l:3})}
- setTimeout(()=>menu(win?'Toutes les livraisons sont faites !':'Mission ratée','Score total : '+m.tot+' pts  ·  +'+gain+' 🪙'+(win?'':'  ·  Le temps est écoulé.'),g.k),1800)}
+function mEnd(win){const g=G,m=g.ms;g.done=1;let gain=0,stars=0;if(win){gain=Math.round(m.tot/5);GAR.c+=gain;sv2();vib([30,40,80]);txt.push({t:'LIVRAISONS TERMINÉES',x:W/2,y:H*.38,a:0,c:'#ffd24a',sz:32});for(let i=0;i<120;i++)conf.push({x:W/2,y:H*.4,vx:rnd(-380,380),vy:rnd(-620,-120),c:['#ffd24a','#00e5ff','#ff3df2','#7dff6b'][i%4],r:rnd(0,6),s:rnd(5,10),l:3})
+  if(typeof g.k=='number'&&g.l.st){stars=m.tot>=g.l.st[1]?3:m.tot>=g.l.st[0]?2:1;if(stars>(SAVE[g.k]||0)){SAVE[g.k]=stars;svSave()}}}
+ setTimeout(()=>result({win,k:g.k,sc:m.tot,t:g.el,stars,gain,hits:g.hits,perf:0,why:'Le temps est écoulé !'}),win?1500:700)}
 const BZ=S=>{const c=S[0],t=S[S.length-1];return[[c,-35,45,20,95],[c,-35,10,-60,-20],[c,36,95,-24,24],[t,-t.len/2-110,-t.len/2,-t.wd/2-6,t.wd/2+6],[t,-t.len/2,t.len/2,t.wd/2,t.wd/2+50]]};
 let BZON=true;
 function veh(c,g){const S=segs(g),gt=g.l.gtype;const LN=s=>[Math.sin(s.a)*g.ln*5,-Math.cos(s.a)*g.ln*5];
@@ -423,17 +464,44 @@ function frame(now){const dt=Math.min(.05,(now-last)/1e3);last=now;
   for(const r of rings)r.r+=dt*320;for(let i=conf.length;i--;)if(conf[i].l<=0)conf.splice(i,1);
   overlay(cx,dt);for(let i=txt.length;i--;)if(txt[i].a>2.4)txt.splice(i,1);
   $('h1').textContent=G.ms?'Mission '+(G.ms.i+1)+'/'+l.missions.length+' · '+(G.ms.st?'Livrer : ':'Charger : ')+l.docks[G.ms.st?l.missions[G.ms.i].b:l.missions[G.ms.i].a].n:l.n;$('h2').textContent=(G.ms?'⏱ '+Math.max(0,G.ms.t).toFixed(0)+' s':l.time?'⏱ '+Math.max(0,G.t).toFixed(1)+' s':'⏱ '+G.el.toFixed(1)+' s')+'  ·  '+Math.round(Math.abs(G.v)*.25)+' km/h  ·  '+(T.gear<0?'R':T.gear==0?'N':'D'+G.gr);
-  $('h3').textContent=(l.cargo||G.cargo>0?'Cargaison '+Math.round(G.cargo)+'% ('+Math.round(Math.abs(G.o)*100)+'% de roulis)':l.type=='park'?'Précision : '+(G.err==null?'–':Math.max(0,Math.round(100-G.err*300))+'%'):'')+'  ·  Chocs '+G.hits+(l.xs?'  ·  Feux '+G.red:'');
+  $('h3').textContent=(l.cargo||G.cargo>0?'Cargaison '+Math.round(G.cargo)+'% ('+Math.round(Math.abs(G.o)*100)+'% de roulis)':l.type=='park'?'Précision : '+(G.err==null?'–':Math.max(0,Math.round(100-G.err*300))+'%'):'')+'  ·  Chocs '+G.hits+(BEST[String(G.k)]?'  ·  🏆 '+BEST[String(G.k)].s:'')+(l.xs?'  ·  Feux '+G.red:'');
   $('bi').style.width=(l.cargo||G.cargo>0?G.cargo:G.hold/.8*100)+'%';
   $('dump').style.display=l.type=='zone'&&!l.auto?'':'none';$('bz').style.display=l.type=='free'?'':'none';$('warn').textContent=l.type=='free'&&G.warn&&!G.done?'⚠ ANGLE MORT':''}
  else{audUpd({v:0,done:1},0,dt)}
  wh.style.transform='rotate('+wr+'rad)';requestAnimationFrame(frame)}
 
 /* ===== 7. MENUS ===== */
-function menu(t,d,again){const o=$('ov');o.classList.remove('hide');if(G){G.done=1;G.warn=0}$('mlw').classList.add('hide');$('mrw').classList.add('hide');
- o.innerHTML='<h1>'+t+'</h1><p>'+d+'</p>'+(again!=null?'<button class="b" data-k="'+again+'">Rejouer</button>'+(SAVE[again]>0&&again<CAMP.length-1?'<button class="b" data-k="'+(again+1)+'">Niveau suivant ▶</button>':''):'')+
- '<div id="lv">'+CAMP.map((c,i)=>{const u=i==0||SAVE[c.u!=null?c.u:i-1]>0,s=SAVE[i]||0;return '<button class="b" '+(u?'':'disabled ')+'data-k="'+i+'">'+(i+1)+'<br>'+(u?'★'.repeat(s)+'☆'.repeat(3-s):'🔒')+'</button>'}).join('')+'</div><div id="vl"><button class="b" data-k="v1">🏘 Village libre<br>1 remorque</button><button class="b" data-k="v2">🏘 Village libre<br>2 remorques</button><button class="b" data-k="m1">📦 Livraisons<br>1 remorque</button><button class="b" data-k="m2">📦 Livraisons<br>2 remorques</button></div><button class="b" data-g="1">🔧 Garage · '+GAR.c+' 🪙</button>';
- o.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.g?garage():start(isNaN(+b.dataset.k)?b.dataset.k:+b.dataset.k))}
+function result(o){const g=G;if(!g||g.rsd)return;g.rsd=1;const k=o.k,key=String(k),isC=typeof k=='number',inf=lvInfo(k),ov=$('ov');
+ let rec=0;const prev=BEST[key];if(o.win&&(!prev||o.sc>prev.s)){BEST[key]={s:o.sc,t:+o.t.toFixed(1)};svBest();rec=prev?2:1}
+ const best=BEST[key],next=isC&&o.win&&k+1<CAMP.length?k+1:-1,beat=o.win&&CH&&inf.niveau==CH.n&&o.sc>CH.d;
+ if(o.win)GA('niveau_termine',Object.assign({score:o.sc,etoiles:o.stars,temps_s:Math.round(o.t),chocs:o.hits,record:rec==2?1:0},inf));
+ else GA('partie_perdue',Object.assign({temps_s:Math.round(o.t),score:o.sc,niveau_max:Math.max(inf.niveau,SAVE.reduce((m,v,i)=>v>0?Math.max(m,i+2):m,1))},inf));
+ $('mlw').classList.add('hide');$('mrw').classList.add('hide');ov.classList.remove('hide');
+ const name=isC?CAMP[k].n.replace(/^\d+ · /,''):(k[0]=='m'?'Livraisons':'Village libre');
+ ov.innerHTML='<div class="rs"><h1 class="'+(o.win?'':'lose')+'">'+(o.win?(isC?'NIVEAU '+inf.niveau+' RÉUSSI !':'MISSION RÉUSSIE !'):'PERDU !')+'</h1><div class="sub">'+name+'</div>'
+ +(o.win&&(isC||o.stars)?'<div class="stars">'+'★'.repeat(o.stars)+'<span style="opacity:.3">'+'★'.repeat(3-o.stars)+'</span></div>':'')
+ +'<div class="sc">'+(o.win?o.sc+' pts':o.why)+'</div><div class="sub">⏱ '+o.t.toFixed(1)+' s · Chocs '+o.hits+(o.win?' · +'+o.gain+' 🪙':'')+'</div>'
+ +(rec==2?'<div class="rec">🏆 NOUVEAU RECORD !</div>':best?'<div class="sub">🏆 Record : '+best.s+' pts ('+best.t+' s)</div>':'')
+ +(beat?'<div class="rec">🥇 Tu as battu le défi de ton ami ('+CH.d+' pts) !</div>':'')
+ +(next>=0?'<button class="b big pri" data-a="next">Niveau suivant ▶</button>':(o.win&&isC?'<div class="rec">🎉 Campagne terminée !</div>':'<button class="b big pri" data-a="again">↻ REJOUER</button>'))
+ +'<div class="rb">'+(next>=0||(o.win&&isC)?'<button class="b" data-a="again">↻ Rejouer</button>':'<button class="b" data-a="share">📣 Défie tes amis</button>')
+ +(next>=0||(o.win&&isC)?'<button class="b" data-a="share">📣 Défie tes amis</button>':'<button class="b" data-a="menu">☰ Menu</button>')+'</div>'
+ +(next>=0||(o.win&&isC)?'<button class="b" data-a="menu" style="padding:8px 14px">☰ Menu</button>':'')+'<div id="cp" class="sub"></div></div>';
+ ov.querySelectorAll('button').forEach(b=>b.onclick=async()=>{const a=b.dataset.a,ctx=o.win?'victoire':'defaite';
+  if(a=='next'){start(next,'suivant')}
+  else if(a=='again'){GA('bouton_rejouer',Object.assign({contexte:ctx},inf));start(k,'rejouer')}
+  else if(a=='menu')menu('CONVOY EXTREME','Choisis un niveau.');
+  else if(a=='share'){GA('bouton_partager',Object.assign({contexte:ctx,score:o.win?o.sc:0},inf));
+   const url=BASE+(isC?'?n='+inf.niveau+(o.win?'&d='+o.sc:''):''),msg=o.win?'🚛 J’ai fait '+o.sc+' pts'+(isC?' au niveau '+inf.niveau:'')+' sur Convoy Extreme ! Tu peux faire mieux ? ':'🚛 Je bloque'+(isC?' au niveau '+inf.niveau:'')+' sur Convoy Extreme… tu y arrives, toi ? ';
+   const ok=await copyTxt(msg+url);b.textContent=ok?'✅ Lien copié !':'📣 Copie le lien ↓';$('cp').innerHTML=ok?'':'<input readonly style="width:min(320px,86vw);padding:8px" value="'+url+'">';const i=$('cp').firstChild;if(i)i.select()}})}
+function menu(t,d){const o=$('ov');o.classList.remove('hide');if(G){G.done=1;G.warn=0}$('mlw').classList.add('hide');$('mrw').classList.add('hide');
+ const un=i=>i==0||SAVE[i-1]>0||SAVE.some((v,j)=>j>i&&v>0),done=SAVE.filter(v=>v>0).length;let cont=0;while(cont<CAMP.length-1&&SAVE[cont]>0)cont++;
+ const tot=CAMP.reduce((a,c,i)=>a+((BEST[i]||{}).s||0),0);
+ o.innerHTML='<h1>'+t+'</h1>'+(CH?'<div class="ch">🏁 Un ami a fait <b>'+(CH.d?CH.d+' pts':'un score')+'</b> au niveau '+CH.n+'. Peux-tu le battre ?</div><button class="b big pri" data-k="'+(Math.min(CH.n,CAMP.length)-1)+'" data-src="defi">⚔️ RELEVER LE DÉFI · niveau '+Math.min(CH.n,CAMP.length)+'</button>':'')
+ +'<button class="b big'+(CH?'':' pri')+'" data-k="'+cont+'" data-src="continuer">▶ '+(done?'CONTINUER':'JOUER')+' · niveau '+(cont+1)+'</button><p>'+(tot?'🏆 Score total : '+tot+' pts · ':'')+d+'</p>'
+ +'<div id="lv">'+CAMP.map((c,i)=>{const u=un(i),s=SAVE[i]||0,b=BEST[i];return '<button class="b" '+(u?'':'disabled ')+'data-k="'+i+'">'+(i+1)+'<br>'+(u?'★'.repeat(s)+'☆'.repeat(3-s):'🔒')+'</button>'}).join('')+'</div><div id="vl"><button class="b" data-k="v1">🏘 Village libre<br>1 remorque</button><button class="b" data-k="v2">🏘 Village libre<br>2 remorques</button><button class="b" data-k="m1">📦 Livraisons<br>1 remorque</button><button class="b" data-k="m2">📦 Livraisons<br>2 remorques</button></div><button class="b" data-g="1">🔧 Garage · '+GAR.c+' 🪙</button>';
+ o.querySelectorAll('button').forEach(b=>b.onclick=()=>b.dataset.g?garage():start(isNaN(+b.dataset.k)?b.dataset.k:+b.dataset.k,b.dataset.src||'menu'))}
 menu('CONVOY EXTREME','Cargo &amp; Rescue — Volant tactile, GAZ/FREIN, levier D/N/R. Clavier : flèches ou WASD, Espace = frein, H = klaxon, B = benne, C = vue cabine, V = angles morts, T = aide marche arrière (le volant pilote la remorque). Sur mobile, glisse le doigt sur GAZ : en haut = plein gaz, en bas = gaz doux pour les manœuvres. Marche arrière : le rétroviseur est ton ami.');
+if(CH)GA('defi_ouvert',{niveau:CH.n,score:CH.d});
 requestAnimationFrame(frame);
 </script></body></html>
